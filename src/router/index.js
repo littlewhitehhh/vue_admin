@@ -1,21 +1,50 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 
+// 引入router组件
+import Login from '../views/Login/Login'
+import Home from '../views/home/home'
+
 
 Vue.use(VueRouter)
 
 const routes = [
+    // 重定向
+    {
+        path: '/',
+        redirect: '/login'
+    },
     // 登录首页 Login
     {
-        path: '/login'
-            // component:
+        name: 'Login',
+        path: '/login',
+        component: Login,
+    },
+    // Home页面
+    {
+        name: 'Home',
+        path: '/home',
+        component: Home,
+
+
     }
 
 ]
 
 const router = new VueRouter({
-    routes,
+        routes,
 
+    })
+    //挂载路由导航首位
+router.beforeEach((to, from, next) => {
+    // to 将要访问的路径
+    // from代表从哪个路径跳转而来
+    //next 是一个函数，表示放行   next()放行   next('/login')强制跳转
+    // console.log(to, from);
+    if (to.path == '/login') { return next() } else {
+        const _token = window.sessionStorage.getItem('token');
+        if (!_token) return next('/login')
+        next()
+    }
 })
-
 export default router

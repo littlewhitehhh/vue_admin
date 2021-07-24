@@ -1,0 +1,145 @@
+<template>
+    <div class="home">
+     <el-container>
+       <!-- 头部 -->
+        <el-header>
+          <!-- logo模块 -->
+          <div class="logo">
+            <img src="../../assets/Images/login/404notfound.png" alt="">
+            <span>后台管理系统</span>
+          </div>
+          <!-- 菜单模块 -->
+          <div class="menu">
+            <el-menu
+              mode="horizontal"   
+              class="el-menu-demo"
+              background-color="#33c3ce"
+              text-color="#fff"
+              active-text-color="skyblue">
+                <el-menu-item index="1">
+                  登陆人的信息
+                </el-menu-item>
+                <el-menu-item index="2" @click="SignOut">退出</el-menu-item>
+            </el-menu>
+          </div>
+        </el-header>
+        <el-container>
+          <!-- 左边框 -->
+          <el-aside :width="isWider?'200px':'65px'">
+            <!-- 用来实现侧边栏切换的按钮 -->
+            <div class="aside-btn" @click="changeWidth">|||</div>
+            <!-- 侧边导航栏 -->
+             <el-menu   
+                router
+                class="el-menu-vertical-demo"
+                @open="handleOpen"
+                @close="handleClose"
+                background-color="#545c64"
+                text-color="#fff"
+                active-text-color="#ffd04b"
+                :unique-opened='true' >
+                  <el-submenu :index="item.id + ''" v-for="(item,id) in menuLists" :key='id'>
+                    <template slot="title">
+                      <i class="el-icon-location"></i>
+                      <span>{{item.authName}}</span>  
+                    </template>
+                    <el-menu-item  :index = "'/' +objitem.path" v-for="(objitem,objid) in item.children" :key="objid">{{objitem.authName}}</el-menu-item>
+                </el-submenu>
+                
+              </el-menu>
+          </el-aside>
+          <!-- 主体部分 -->
+          <el-main>
+            <router-view></router-view>
+          </el-main>
+
+        </el-container>
+      </el-container>
+    </div>
+</template>
+
+<script>
+export default {
+  name:'Home',
+  data() {
+    return {
+      // 左侧列表数据
+      menuLists:[],
+      // 菜单放缩
+      isWider:true,
+    }
+  },
+  created() {
+    this.getMenuList();
+  },
+  methods: {
+    // 退出登录
+    SignOut(){
+      this.$router.push('/login')
+      window.sessionStorage.removeItem('token')
+    },
+    //改变侧边栏宽度
+    changeWidth(){
+      this.isWider = ! this.isWider
+      console.log(this.isWider);
+    },
+    handleOpen(key, keyPath) {
+        console.log('handleOpen',key, keyPath);
+      },
+    handleClose(key, keyPath) {
+        console.log('handleClose',key, keyPath);
+    },
+
+    // 获取数据
+    getMenuList(){
+      this.$require.get('menus')
+        .then(res=>{
+          console.log(res);
+          this.menuLists = res.data.data
+        }).catch(err=>{
+          console.log(err);
+        })
+    },
+    
+  },
+}
+</script>
+
+<style scoped>
+.home{
+  height: 100%;
+}
+.el-header {
+  display: flex;
+  justify-content: space-between;
+  background-color: #33c3ce;
+  height: 60px;
+  line-height: 60px;
+}
+.logo{
+  height: 100%;
+  display: flex;
+  line-height: 60px;
+  color: white;
+  font-size: 20px;
+}
+.logo img {
+  height:100%;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-right:20px  ; 
+}
+.el-container{
+  background-color: pink;
+  height: 100%;
+}
+.el-aside{
+  background-color: red;
+}
+.aside-btn {
+  margin: 10px 0;
+  text-align: center;
+  color: #fff; 
+  cursor: pointer;
+}
+</style>

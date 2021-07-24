@@ -1,12 +1,16 @@
 <template>
-  <div>
-    <el-button type="primary">默认按钮</el-button>
+  <div id="app">
+   <!-- 路由占位符 -->
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
 export default {
-  
+  name:'App',
+  mounted() {
+    // console.log(this)
+  },
 }
 </script>
 <style>
