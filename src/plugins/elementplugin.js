@@ -12,7 +12,15 @@ import {
     Menu,
     MenuItem,
     MenuItemGroup,
-    Submenu
+    Submenu,
+    Breadcrumb,
+    BreadcrumbItem,
+    Table,
+    TableColumn,
+    Switch,
+    Dialog,
+    Message,
+    MessageBox
 } from 'element-ui';
 
 Vue.use(Button)
@@ -28,3 +36,12 @@ Vue.use(Menu)
 Vue.use(MenuItem)
 Vue.use(MenuItemGroup)
 Vue.use(Submenu)
+Vue.use(Breadcrumb)
+Vue.use(BreadcrumbItem)
+Vue.use(Table)
+Vue.use(TableColumn)
+Vue.use(Switch)
+Vue.use(Dialog)
+
+Vue.prototype.$message = Message
+Vue.prototype.$confirm = MessageBox

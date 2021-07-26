@@ -25,22 +25,23 @@
         </el-header>
         <el-container>
           <!-- 左边框 -->
-          <el-aside :width="isWider?'200px':'65px'">
+          <el-aside :width="isWider?'199px':'64px'">
             <!-- 用来实现侧边栏切换的按钮 -->
             <div class="aside-btn" @click="changeWidth">|||</div>
             <!-- 侧边导航栏 -->
              <el-menu   
                 router
                 class="el-menu-vertical-demo"
-                @open="handleOpen"
-                @close="handleClose"
+                
                 background-color="#545c64"
                 text-color="#fff"
                 active-text-color="#ffd04b"
-                :unique-opened='true' >
+                :unique-opened='true' 
+                :collapse = "!isWider"
+                :collapse-transition = "false" >
                   <el-submenu :index="item.id + ''" v-for="(item,id) in menuLists" :key='id'>
                     <template slot="title">
-                      <i class="el-icon-location"></i>
+                      <i :class="iconLists[item.order-1]"></i>
                       <span>{{item.authName}}</span>  
                     </template>
                     <el-menu-item  :index = "'/' +objitem.path" v-for="(objitem,objid) in item.children" :key="objid">{{objitem.authName}}</el-menu-item>
@@ -67,6 +68,17 @@ export default {
       menuLists:[],
       // 菜单放缩
       isWider:true,
+      // 字体图标数数组
+      iconLists:[
+        'el-icon-user-solid',
+        'el-icon-lock',
+        'el-icon-s-goods',
+        'el-icon-s-order',
+        'el-icon-s-marketing'
+
+      ]
+      
+      
     }
   },
   created() {
@@ -83,21 +95,21 @@ export default {
       this.isWider = ! this.isWider
       console.log(this.isWider);
     },
-    handleOpen(key, keyPath) {
+    /* handleOpen(key, keyPath) {
         console.log('handleOpen',key, keyPath);
       },
     handleClose(key, keyPath) {
         console.log('handleClose',key, keyPath);
     },
-
+ */
     // 获取数据
     getMenuList(){
       this.$require.get('menus')
         .then(res=>{
-          console.log(res);
+          // console.log(res);
           this.menuLists = res.data.data
         }).catch(err=>{
-          console.log(err);
+          // console.log(err);
         })
     },
     
@@ -130,11 +142,11 @@ export default {
   margin-right:20px  ; 
 }
 .el-container{
-  background-color: pink;
+  background-color: #f3f3f3;
   height: 100%;
 }
 .el-aside{
-  background-color: red;
+  background-color: #545c64;
 }
 .aside-btn {
   margin: 10px 0;
