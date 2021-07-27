@@ -38,13 +38,22 @@
               type="danger" @click="deleteUser(scope.row.id)">删除</el-button>
               <el-button
               size="mini"
-              type="danger">用户权限</el-button>
+              type="danger" @click="showRoleDialog(scope.row)">用户权限</el-button>
           </template>
         </el-table-column>
       </el-table>
     </div>
     
-
+    <!-- 分页功能 -->
+    <el-pagination
+      @size-change="handleSizeChange"    
+      @current-change="handleCurrentChange"
+      :current-page="queryInfo.pagenum"
+      :page-sizes="[2, 5, 8, 10]"
+      :page-size="queryInfo.pagesize"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="total">
+    </el-pagination>
 
     <!-- 添加用户对话框 -->
     <el-dialog
@@ -79,7 +88,7 @@
       :visible.sync="editDialogVisible"
       width="50%"
       @close="closeEditDialog">
-      <el-form :model="editUserForm" :rules="editUserRules" ref="editUserFormRef" label-width="100px">
+      <el-form :model="editUserForm" ref="editUserFormRef" label-width="100px">
         <el-form-item label="用户名" prop="username">
             <el-input v-model="editUserForm.username" disabled></el-input>
         </el-form-item>
@@ -92,20 +101,28 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="closeEditDialog">取 消</el-button>
-        <el-button type="primary" @click="editUser()">确 定</el-button>
+        <el-button type="primary" @click="editUser">确 定</el-button>
       </span>
     </el-dialog>
 
     <!-- 用户权限对话框 -->
     <el-dialog
       title="修改用户"
-      :visible.sync="editDialogVisible"
+      :visible.sync="roleDialogVisible"
       width="50%"
-      @close="closeEditDialog">
-      
+      @close="closeRoleDialog">
+      <p>当前的用户:{{roleData.username}}</p>
+      <p>当前的角色:{{roleData.role_name}}</p>
+      <el-select v-model="selectedRoleId" placeholder="请选择">
+        <el-option
+          v-for="item in roleLists"
+          :key="item.id"
+          :value="item.roleName">
+        </el-option>
+      </el-select>      
       <span slot="footer" class="dialog-footer">
-        <el-button @click="closeEditDialog">取 消</el-button>
-        <el-button type="primary" @click="editUser()">确 定</el-button>
+        <el-button @click="closeRoleDialog">取 消</el-button>
+        <el-button type="primary" @click="changeRole">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -116,7 +133,7 @@ export default {
   name:'Users',
   data() {
     return {
-      // 表格数据
+      //表格用户数据
       tableData: [],
       // 获取用户列表的参数对象
       queryInfo:{
@@ -125,8 +142,10 @@ export default {
         /* 当前页数 */
         pagenum: 1,
         /* 当前每页显示多少数据 */
-        pagesize:100
+        pagesize:2
       },
+      // 分页
+        total:0,
 
       // 添加用户
       // 控制添加用户对话框显示与隐藏
@@ -165,12 +184,18 @@ export default {
         email:'',
         mobile:''
       },
-      // 修改用户表单验证
-      editUserRules:{
-
-      },
       // 当前所修改数据的id
       currentID:'',
+
+      // 修改用户角色
+      //控制修改用户角色对话框显示与隐藏
+      roleDialogVisible :false,
+      //角色分配数据
+      roleData:{},
+      // 可分配角色列表
+      roleLists:[],
+      // 所选的角色id值
+      selectedRoleId:'',
     }
   },
   mounted() {
@@ -185,12 +210,26 @@ export default {
       .then(res=>{
           // console.log(res.data.data.users);
           this.tableData = res.data.data.users
+          this.total =res.data.data.total
       }).catch(err=>{
         console.log(err);
       })
       // console.log(this.$refs);
     },
-  // 搜索用户
+
+
+
+    // 分页功能
+    // 改变pagesize事件触发
+    handleSizeChange(val){
+       this.queryInfo.pagesize = val
+       this.getUserData()
+    },
+    // 改变当前页触发事件
+    handleCurrentChange(val){
+        this.queryInfo.pagenum = val
+        this.getUserData()
+    },
 
 
 
@@ -302,6 +341,44 @@ export default {
                 }
         }
       
+    },
+
+    // 分配用户角色
+    // 打开分配用户角色对话框
+    showRoleDialog(data){
+    this.roleData = data
+    
+    // console.log(data);
+    this.roleDialogVisible = true
+    this.$require.get('roles')
+      .then(res=>{
+        if(res.data.meta.status !=200){
+          this.$confirm(res.data.meta.msg)
+        }else{
+          console.log(res)
+          this.roleLists = res.data.data
+        }
+        
+      })
+    },
+    //关闭分配用户角色对话框
+    closeRoleDialog(){
+    this.roleDialogVisible = false
+    },
+    // 改变用户角色
+    changeRole(){
+    this.$require.put(`users/${this.roleData.id}/role`, {rid:this.selectedRoleId})
+    .then(res=>{
+      console.log(res);
+      if(res.data.meta.status!==200){
+                   
+          return this.$message.error('更新角色失败')
+      }else{
+          this.$message.success('更新角色成功');
+          this.getUserData();
+          this.roleDialogVisible = false
+      }
+    })
     }
   },
 }
