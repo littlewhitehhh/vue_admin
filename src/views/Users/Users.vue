@@ -242,14 +242,13 @@ export default {
     // 关闭添加用户信息对话框并提交到服务器
     addUser(){
       this.addUserDialogVisible = false
-      console.log(this.addUserForm);
+      // console.log(this.addUserForm);
       
       this.$require.post('users',this.addUserForm)
         .then(res=>{
           console.log(res);
           if(res.data.meta.status){
             this.$message.success(res.data.meta.msg)
-            
             this.getUserData()
           }else{
             this.$confirm('添加用户失败')

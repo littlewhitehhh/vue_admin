@@ -32,7 +32,7 @@
              <el-menu   
                 router
                 class="el-menu-vertical-demo"
-                
+                :default-active="activePath"
                 background-color="#545c64"
                 text-color="#fff"
                 active-text-color="#ffd04b"
@@ -44,7 +44,7 @@
                       <i :class="iconLists[item.order-1]"></i>
                       <span>{{item.authName}}</span>  
                     </template>
-                    <el-menu-item  :index = "'/' +objitem.path" v-for="(objitem,objid) in item.children" :key="objid">{{objitem.authName}}</el-menu-item>
+                    <el-menu-item  :index = "'/' +objitem.path" v-for="(objitem,objid) in item.children" :key="objid"  @click = "saveNavStats('/'+item.path)">{{objitem.authName}}</el-menu-item>
                 </el-submenu>
                 
               </el-menu>
@@ -76,19 +76,25 @@ export default {
         'el-icon-s-order',
         'el-icon-s-marketing'
 
-      ]
+      ],
       
+      // 保证页面刷新后导航栏所显示项依旧高亮
+      //被激活的链接地址
+        activePath:'',
       
     }
   },
   created() {
     this.getMenuList();
+    // 读取高亮的地址
+    this.activePath = window.sessionStorage.getItem('activePath')
   },
   methods: {
     // 退出登录
     SignOut(){
       this.$router.push('/login')
       window.sessionStorage.removeItem('token')
+      window.sessionStorage.removeItem('activePath')
     },
     //改变侧边栏宽度
     changeWidth(){
@@ -112,7 +118,13 @@ export default {
           // console.log(err);
         })
     },
-    
+
+    // //保存连接的激活状态
+    saveNavStats(activePath){
+      window.sessionStorage.setItem('activePath',activePath);
+      //点击不同链接时候，给cativePath赋值 ，实现高亮效果的动态切换
+      this.activePath = activePath
+    } 
   },
 }
 </script>
