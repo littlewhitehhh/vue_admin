@@ -48,16 +48,16 @@ const routes = [
                 path: '/roles',
                 component: Roles
             },
-            {
+            /* {
                 name: 'Users',
                 path: '/rights',
                 component: Users
-            },
-            {
+            }, */
+            /* {
                 name: 'Users',
                 path: '/goods',
                 component: Users
-            },
+            }, */
 
         ]
 

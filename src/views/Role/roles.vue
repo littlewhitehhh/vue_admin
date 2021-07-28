@@ -22,28 +22,26 @@
             <template slot-scope="scope">
               <!-- 栅格布局 -->
               <!-- 第一层遍历   -->
-             <el-row v-for="(firstItem, id) in scope.row.children" :key="id" class="first" :class="['bdbottom', index == 0?'bdtop':'','vcenter']">
-              <el-col :span="6">
-                <el-tag closable>{{firstItem.authName}}</el-tag> 
-                <i class="el-icon-caret-right"></i>
-              </el-col>
-              <el-col :span="18">
-                <!-- 第二层遍历 -->
-                <el-row v-for="(secondItem ,id2) in firstItem.children " :key="id2">
-                  <el-col :span="5" >
-                    <el-tag closable type="success" >{{secondItem.authName}}</el-tag>
-                    <i class="el-icon-caret-right"></i>
-                  </el-col>
-                  <el-col :span ="19">
-                    <!-- 第三层遍历 -->
-                    <el-row v-for="(lastItem ,id3) in secondItem.children " :key="id3">
-                      <el-col :span="16" :offset="8">
-                        <el-tag closable type="danger">{{lastItem.authName}}</el-tag>
-                        
-                      </el-col>
-                    </el-row>
-                  </el-col>
-                </el-row>
+              <el-row :class="['bdbottom', index == 0?'bdtop':'','vcenter']" :key = " item.id" v-for = "(item,index) in scope.row.children" >
+                <!-- 渲染以及权限 -->
+                <el-col :span = "5">
+                  <el-tag closable @close ="removeRightById(scope.row,item2.id)" >{{item.authName}}</el-tag>
+                  <i class="el-icon-caret-right"></i>
+                </el-col>
+                  <!-- 渲染二级三级权限 -->
+                <el-col :span = "19">
+                   <!-- 通过for循环渲染二级权限 -->
+                    <el-row :key="item1.id" v-for="(item1,index2) in item.children" :class="[index2 ==0?'':'bdtop','vcenter']">
+                    <el-col :span="6">
+                      <el-tag type="success" closable  @close ="removeRightById(scope.row,item1.id)" >{{item1.authName}}</el-tag>
+                      <i class="el-icon-caret-right"></i>
+                    </el-col>
+                    <el-col :span="18">
+                      <el-tag :key = 'item2.id' v-for="(item2) in item1.children" type="warning" closable @close ="removeRightById(scope.row,item2.id)">{{item2.authName}}</el-tag>
+
+                     </el-col>
+                 </el-row>
+                </el-col>
                   
                   <!-- <el-col ：span='5'> -->
                     <!-- <el-tag closable type="success" >{{secondItem.authName}}</el-tag> -->
@@ -53,7 +51,7 @@
                    
                       <el-tag closable type="warning" v-for="(lastItem ,id3) in secondItem.children " :key="id3">{{lastItem.authName}}</el-tag>
                   </el-col> -->
-              </el-col>
+            
 
 
               
@@ -82,7 +80,7 @@
                 <el-button
                 size="mini"
                 type="warning"
-                @click="showRightDialog(scope)"
+                @click="showRightDialog(scope.row)"
                 >分配权限</el-button>
             </template>
           </el-table-column>
@@ -140,8 +138,18 @@
         :visible.sync="rightDialogVisible"
         width="40%"
         @close='closeRightsDialog'>
-        
-
+        <!-- 权限树 -->
+          <el-tree
+            :data="rightLists"
+            show-checkbox
+            default-expand-all
+            node-key="id"
+            ref="treeRef"
+            
+            :default-checked-keys="defKays"
+            :props="defaultProps"
+          >
+          </el-tree>
         <span slot="footer" class="dialog-footer">
           <el-button @click="closeRightsDialog">取 消</el-button>
           <el-button type="primary" @click="rightSubmit">确 定</el-button>
@@ -186,7 +194,15 @@ export default {
       //  角色权限分配
       rightDialogVisible:false,
       // 角色权限列表
-      rightLists:[]
+      rightLists:[],
+      // 当前需要分配角色的id
+      roleID:0,
+      defKays:[],
+      defaultProps:{
+        children:'children',
+        label:'authName'
+      }
+      
     }
   },
   mounted() {
@@ -297,25 +313,78 @@ export default {
 
     // 权限分配
     // 显示角色分配对话框
-    showRightDialog(data){
+    showRightDialog(role){
       // console.log(data);
-      this.rightDialogVisible=true
+      this.roleID = role.id
+      // 查询所有权限列表
       this.$require.get(`rights/tree`)
       .then(res=>{
-        console.log(res); 
-        this.rightLists = res.data.data
+        // console.log(res); 
+        this.rightLists = res.data.data  
       })
+      // 获取当前角色的权限
+      this.getLeafKay(role,this.defKays)
+      this.rightDialogVisible=true 
+      // console.log(this.defKays);
     },
+    //通过递归的方式，获取所有角色下的三级权限id，并保存带数组中
+    getLeafKay(node,arr){
+      // 如果当前node节点不包含children属性则是三级节点
+      if(!node.children){
+        return arr.push(node.id)
+      }else{
+        node.children.forEach(item=>{
+          this.getLeafKay(item,arr)
+        })
+      }
+    },
+
     // 关闭分配权限对话框
     closeRightsDialog(){
+      // 重置数组
+      this.defKays =[];
       this.rightDialogVisible=false  
     },
 
     //提交角色分配
-    rightSubmit(){
-      this.rightDialogVisible=false  
+    rightSubmit(){  
 
-    } 
+      const keys = [...this.$refs.treeRef.getCheckedKeys(),...this.$refs.treeRef.getHalfCheckedKeys()]
+
+       const idStr = keys.join(',')
+       this.$require.post(`roles/${this.roleID}/rights`,{rids:idStr})
+        .then(res=>{
+          // console.log(res);
+          if(res.data.meta.status !=200){
+            this.$confirm(res.data.meta.msg)
+          } else{
+            this.$message.success(res.data.meta.msg)
+             this.getRoleData();
+            this.rightDialogVisible=false
+          }
+         
+        })
+      // this.rightDialogVisible=false  
+
+    },
+    //删除角色权限
+    removeRightById(row,id){
+      console.log(row,id);
+      this.$require.delete(`roles/${row.id}/rights/${id}`)
+        .then(res=>{
+          console.log(res);
+          if(res.data.meta.status !=200){
+            this.$confirm(res.data.meta.msg)
+          }else{
+            this.$message.success(res.data.meta.msg)
+            row.children = res.data.data
+          }
+        })
+    }
+
+
+  
+    
   }
 }
 </script>
@@ -342,4 +411,5 @@ export default {
   display: flex;
   align-items: center;
 }
+
 </style>

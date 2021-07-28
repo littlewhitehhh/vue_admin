@@ -44,7 +44,7 @@
                       <i :class="iconLists[item.order-1]"></i>
                       <span>{{item.authName}}</span>  
                     </template>
-                    <el-menu-item  :index = "'/' +objitem.path" v-for="(objitem,objid) in item.children" :key="objid"  @click = "saveNavStats('/'+item.path)">{{objitem.authName}}</el-menu-item>
+                    <el-menu-item :index="'/'+item.path" :key="item.id" v-for="(item) in item.children" @click = "saveNavStats('/'+item.path)">{{item.authName}}</el-menu-item>
                 </el-submenu>
                 
               </el-menu>
@@ -93,21 +93,14 @@ export default {
     // 退出登录
     SignOut(){
       this.$router.push('/login')
-      window.sessionStorage.removeItem('token')
-      window.sessionStorage.removeItem('activePath')
+      window.sessionStorage.clear()
     },
     //改变侧边栏宽度
     changeWidth(){
       this.isWider = ! this.isWider
       console.log(this.isWider);
     },
-    /* handleOpen(key, keyPath) {
-        console.log('handleOpen',key, keyPath);
-      },
-    handleClose(key, keyPath) {
-        console.log('handleClose',key, keyPath);
-    },
- */
+    
     // 获取数据
     getMenuList(){
       this.$require.get('menus')
