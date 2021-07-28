@@ -26,7 +26,9 @@ import {
     Row,
     Col,
     Tag,
-    Tree
+    Tree,
+    Card,
+    Alert,
 } from 'element-ui';
 
 Vue.use(Button)
@@ -54,6 +56,8 @@ Vue.use(Row)
 Vue.use(Col)
 Vue.use(Tag)
 Vue.use(Tree)
+Vue.use(Card)
+Vue.use(Alert)
 
 
 
