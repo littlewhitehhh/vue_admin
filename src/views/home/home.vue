@@ -25,7 +25,7 @@
         </el-header>
         <el-container>
           <!-- 左边框 -->
-          <el-aside :width="isWider?'199px':'64px'">
+          <el-aside :width="isWider?'190px':'64px'">
             <!-- 用来实现侧边栏切换的按钮 -->
             <div class="aside-btn" @click="changeWidth">|||</div>
             <!-- 侧边导航栏 -->
@@ -152,11 +152,16 @@ export default {
 }
 .el-aside{
   background-color: #545c64;
+  overflow: hidden;
 }
 .aside-btn {
   margin: 10px 0;
   text-align: center;
   color: #fff; 
   cursor: pointer;
+  
+}
+.el-main {
+  overflow: hidden;
 }
 </style>

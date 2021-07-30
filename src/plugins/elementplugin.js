@@ -29,6 +29,15 @@ import {
     Tree,
     Card,
     Alert,
+    Steps,
+    Step,
+    Tabs,
+    TabPane,
+    Cascader,
+    CascaderPanel,
+    Upload,
+    Checkbox,
+    CheckboxGroup
 } from 'element-ui';
 
 Vue.use(Button)
@@ -58,6 +67,16 @@ Vue.use(Tag)
 Vue.use(Tree)
 Vue.use(Card)
 Vue.use(Alert)
+Vue.use(Steps)
+Vue.use(Step)
+Vue.use(Tabs)
+Vue.use(TabPane)
+Vue.use(Cascader)
+Vue.use(CascaderPanel)
+Vue.use(Upload)
+Vue.use(Checkbox)
+Vue.use(CheckboxGroup)
+
 
 
 

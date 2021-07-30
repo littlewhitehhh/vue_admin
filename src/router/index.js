@@ -21,6 +21,7 @@ const routes = [
         path: '/',
         redirect: '/login'
     },
+
     // 登录首页 Login
     {
         name: 'Login',
