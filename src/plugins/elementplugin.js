@@ -37,7 +37,9 @@ import {
     CascaderPanel,
     Upload,
     Checkbox,
-    CheckboxGroup
+    CheckboxGroup,
+    Timeline,
+    TimelineItem
 } from 'element-ui';
 
 Vue.use(Button)
@@ -76,6 +78,8 @@ Vue.use(CascaderPanel)
 Vue.use(Upload)
 Vue.use(Checkbox)
 Vue.use(CheckboxGroup)
+Vue.use(Timeline)
+Vue.use(TimelineItem)
 
 
 

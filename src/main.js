@@ -16,6 +16,9 @@ import TreeTable from 'vue-table-with-tree-grid'
 
 Vue.component('tree-table', TreeTable)
 
+// 引入e-charts
+/* import echarts from 'echarts'
+Vue.prototype.$echarts = echarts */
 Vue.config.productionTip = false //关闭生产模式的提示
 
 Vue.filter('dataFormat', function(originVal) {

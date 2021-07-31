@@ -238,7 +238,7 @@ export default {
           this.editCateDialogVisible = true
           this.$require.get(`categories/${id}`)
             .then(res=>{
-              console.log(res);
+            //   console.log(res);
               this.editCateForm = res.data.data
             })
         },
