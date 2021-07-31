@@ -12,8 +12,9 @@ import require from './network/require'
 // vue全局配置require
 Vue.prototype.$require = require
 
+import TreeTable from 'vue-table-with-tree-grid'
 
-
+Vue.component('tree-table', TreeTable)
 
 Vue.config.productionTip = false //关闭生产模式的提示
 

@@ -161,7 +161,7 @@ export default {
   cursor: pointer;
   
 }
-.el-main {
+/* .el-main {
   overflow: hidden;
-}
+} */
 </style>
